@@ -2,7 +2,8 @@ import os
 import numpy as np
 import gzip
 
-# mnist dataset was manually downloaded from http://yann.lecun.com/exdb/mnist/
+
+"""mnist dataset was manually downloaded from http://yann.lecun.com/exdb/mnist/"""
 class DataLoader(object):
 
     def __init__(self):

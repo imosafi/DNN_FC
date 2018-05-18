@@ -1,5 +1,6 @@
 import numpy as np
-from  utils import ACTIVATION_NAME_TO_DERIVATIVE, ACTIVATION_NAME_TO_FUNC
+from utils import ACTIVATION_NAME_TO_DERIVATIVE, ACTIVATION_NAME_TO_FUNC
+
 
 class GradientsCalculator(object):
     def __init__(self, activation_name):
@@ -10,8 +11,6 @@ class GradientsCalculator(object):
         gradients_values = []
         y_label = np.zeros(params[-1][1].shape)
         y_label[y] = 1
-
-        # y_pred = classifier_output(x, params)
 
         z_l, a_l = self.__calc_params_for_gradients(x, params)
         g_last_b = y_pred - y_label
@@ -30,9 +29,7 @@ class GradientsCalculator(object):
     def __calc_weight_matrix_grad(x, gb):
         return np.array([x]).transpose().dot([gb])
 
-
     def __calc_weight_vector_grad(self, grad, mat, a):
-        # return grad.dot(mat.transpose()) * (1 - np.power(a, 2))
         return grad.dot(mat.transpose()) * self.__activation_derivative(a)
 
     def __calc_params_for_gradients(self, x, params):
@@ -42,7 +39,6 @@ class GradientsCalculator(object):
         i = 0
         while i < len(params):
             z_l.append(np.array(z_l[-1]).dot(params[i][0]) + params[i][1])
-            # a_l.append(np.tanh(z_l[-1]))
             a_l.append(self.__activation_function(z_l[-1]))
             i += 1
         return z_l, a_l

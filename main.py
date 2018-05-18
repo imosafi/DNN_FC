@@ -13,8 +13,6 @@ def main():
     model.test(test_set)
     model.train(train_set, 10, test_set)
 
-    # print(model.__classifier_output(train_x[0]))
-    # print(model.predict(train_x[0]))
 
 
 if __name__ == '__main__':

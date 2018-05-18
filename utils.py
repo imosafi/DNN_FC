@@ -1,8 +1,7 @@
 import numpy as np
 import math
 
-ACTIVATION_NAMES = ['sigmoid', 'relu', 'tanh']
-
+ACTIVATION_NAMES = ['sigmoid', 'tanh']
 
 
 def softmax(x):
@@ -20,7 +19,7 @@ def sigmoid(x):
 
 
 def sigmoid_derivative(a):
-    """expecting a to be tanh(x)"""
+    """expecting a to be sigmoid(x)"""
     return a * (1 - a)
 
 
@@ -31,3 +30,11 @@ def tanh_derivative(a):
 
 ACTIVATION_NAME_TO_FUNC = {'sigmoid': sigmoid, 'tanh': np.tanh}
 ACTIVATION_NAME_TO_DERIVATIVE = {'sigmoid': sigmoid_derivative, 'tanh': tanh_derivative}
+
+
+def create_confusion_matrix(model, testset):
+    return None
+
+
+def save_test_val_acc_loss(train_acc, val_acc, train_loss, val_loss):
+    return None

@@ -1,7 +1,6 @@
 import numpy as np
 from utils import calc_init_fcnn_values, softmax, ACTIVATION_NAMES
 from gradients_calculator import GradientsCalculator
-import math
 import random
 
 
@@ -10,12 +9,10 @@ class FCClassifierModel(object):
     def __init__(self, dim_sizes, activation='tanh'):
         if activation not in ACTIVATION_NAMES:
             raise Exception('Unknown activation function')
+        self.__dims = dim_sizes
         self.__params = self.__init_params(dim_sizes)
         self.__activation_name = activation
         self.__gradient_calculator = GradientsCalculator(activation)
-
-
-        c = 2
 
     def __init_params(self, dims):
         params = []
@@ -40,12 +37,30 @@ class FCClassifierModel(object):
     def calc_loss(self, y, y_pred):
         return -np.log(y_pred[y])
 
-    def train(self, train_set, epochs, val=None, use_minibatch=True, minibatch_size=32, LR=0.003):
+    @staticmethod
+    def __zero_params(params):
+        for wb in params:
+            wb[0].fill(0.0)
+            wb[1].fill(0.0)
+
+    @staticmethod
+    def add_params_gradients(LR, params, grads):
+        i = 0
+        while i < len(params):
+            params[i][0] -= LR * grads[i][0]
+            params[i][1] -= LR * grads[i][1]
+            i += 1
+
+    def train(self, train_set, epochs, val=None, use_minibatch=True, minibatch_size=25, LR=0.003):
         for epoch in range(epochs):
             output = []
             output.append('Epoch {}:'.format(epoch + 1))
             train_loss = 0.0
             random.shuffle(train_set)
+            if use_minibatch:
+                k = 0
+                mini_batch_params = self.__init_params(self.__dims)
+                self.__zero_params(mini_batch_params)
 
             for x, y in train_set:
                 y_pred = self.__classifier_output(x)
@@ -54,11 +69,16 @@ class FCClassifierModel(object):
 
                 grads = self.__gradient_calculator.calc_gradients(x, y, y_pred, self.__params)
 
-                i = 0
-                while i < len(self.__params):
-                    self.__params[i][0] -= LR * grads[i][0]
-                    self.__params[i][1] -= LR * grads[i][1]
-                    i += 1
+                if use_minibatch:
+                    FCClassifierModel.add_params_gradients(LR, mini_batch_params, grads)
+                    k += 1
+                    if ((k != 0 and k % minibatch_size == 0) or k == len(train_set) - 1):
+                        for wb, wb_grads in zip(self.__params, mini_batch_params):
+                            wb[0] += wb_grads[0]
+                            wb[1] += wb_grads[1]
+                        self.__zero_params(mini_batch_params)
+                else:
+                    FCClassifierModel.add_params_gradients(LR, self.__params, grads)
 
             train_loss /= len(train_set)
             train_accuracy, _ = self.__calc_accuracy_and_loss(train_set)
