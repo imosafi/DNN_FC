@@ -1,9 +1,8 @@
 import os
-import sys
 import numpy as np
 import gzip
 
-
+# mnist dataset was manually downloaded from http://yann.lecun.com/exdb/mnist/
 class DataLoader(object):
 
     def __init__(self):
@@ -38,7 +37,7 @@ class DataLoader(object):
             labels = np.frombuffer(buf, dtype=np.uint8)
         return labels
 
-    def load_dataset(self, name, normalize = True):
+    def load_dataset(self, name, normalize=True):
         data_dir = os.path.join('data', name)
         if not os.path.isdir(data_dir):
             raise Exception('dataset wasn\'t found')
@@ -47,15 +46,15 @@ class DataLoader(object):
             train_x = self.extract_data(self.__path_data_dict[name + '_train_x'],
                                         self.__dataset_size_dict[name + '_train'], name)
             train_y = self.extract_labels(self.__path_data_dict[name + '_train_y'],
-                                        self.__dataset_size_dict[name + '_train'])
-            test_x =  self.extract_data(self.__path_data_dict[name + '_test_x'],
-                                        self.__dataset_size_dict[name + '_test'], name)
+                                          self.__dataset_size_dict[name + '_train'])
+            test_x = self.extract_data(self.__path_data_dict[name + '_test_x'],
+                                       self.__dataset_size_dict[name + '_test'], name)
             test_y = self.extract_labels(self.__path_data_dict[name + '_test_y'],
-                                        self.__dataset_size_dict[name + '_test'])
+                                         self.__dataset_size_dict[name + '_test'])
             if normalize:
                 train_x /= 255
                 test_x /= 255
-            return train_x, train_y, test_x, test_y
+            return list(zip(train_x, train_y)), list(zip(test_x, test_y))
 
         except:
             raise Exception('Failed to load {} data'.format(name))
