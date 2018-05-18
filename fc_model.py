@@ -1,5 +1,5 @@
 import numpy as np
-from utils import calc_init_fcnn_values, softmax, ACTIVATION_NAMES
+from utils import calc_init_fcnn_values, softmax, ACTIVATION_NAMES, save_test_val_acc_loss_plots
 from gradients_calculator import GradientsCalculator
 import random
 
@@ -31,7 +31,7 @@ class FCClassifierModel(object):
             i += 1
         return softmax(np.dot(value, self.__params[-1][0]) + self.__params[-1][1])
 
-    def __predict(self, x):
+    def predict(self, x):
         return np.argmax(self.__classifier_output(x))
 
     def calc_loss(self, y, y_pred):
@@ -52,6 +52,7 @@ class FCClassifierModel(object):
             i += 1
 
     def train(self, train_set, epochs, val=None, use_minibatch=True, minibatch_size=25, LR=0.003):
+        train_acc_list, val_acc_list, train_loss_list, val_loss_list = [], [], [], []
         for epoch in range(epochs):
             output = []
             output.append('Epoch {}:'.format(epoch + 1))
@@ -83,16 +84,22 @@ class FCClassifierModel(object):
             train_loss /= len(train_set)
             train_accuracy, _ = self.__calc_accuracy_and_loss(train_set)
 
+            train_acc_list.append(train_accuracy)
+            train_loss_list.append(train_loss)
             output.append('Train accuracy {}'.format(train_accuracy))
             output.append('Train loss {}'.format(train_loss))
 
             if val is not None:
                 val_accuracy, val_loss = self.__calc_accuracy_and_loss(val)
+                val_acc_list.append(val_accuracy)
+                val_loss_list.append(val_loss)
                 output.append('Validation accuracy {}'.format(val_accuracy))
                 output.append('Validation loss {}'.format(val_loss))
 
             for t in output:
                 print(t)
+
+        save_test_val_acc_loss_plots(train_acc_list, val_acc_list, train_loss_list, val_loss_list)
 
     def test(self, test_set):
         acc, loss = self.__calc_accuracy_and_loss(test_set)
