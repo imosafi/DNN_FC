@@ -1,18 +1,19 @@
 import numpy as np
-from utils import calc_init_fcnn_values, softmax, ACTIVATION_FUNCTIONS
+from utils import calc_init_fcnn_values, softmax, ACTIVATION_NAMES
 from gradients_calculator import GradientsCalculator
 import math
 import random
 
 
 class FCClassifierModel(object):
-    """We'll use the same activation function for the entire network sigmoid/tanh/relu"""
-    def __init__(self, dim_sizes, activation_func='tanh'):
-        if activation_func not in ACTIVATION_FUNCTIONS:
+    """We'll use the same activation function for the entire network sigmoid/tanh"""
+    def __init__(self, dim_sizes, activation='tanh'):
+        if activation not in ACTIVATION_NAMES:
             raise Exception('Unknown activation function')
         self.__params = self.__init_params(dim_sizes)
+        self.__activation_name = activation
+        self.__gradient_calculator = GradientsCalculator(activation)
 
-        # GradientsCalculator.calc_loss_and_gradients()
 
         c = 2
 
@@ -37,7 +38,7 @@ class FCClassifierModel(object):
         return np.argmax(self.__classifier_output(x))
 
     def calc_loss(self, y, y_pred):
-        return -math.log(y_pred[y])
+        return -np.log(y_pred[y])
 
     def train(self, train_set, epochs, val=None, use_minibatch=True, minibatch_size=32, LR=0.003):
         for epoch in range(epochs):
@@ -46,13 +47,12 @@ class FCClassifierModel(object):
             train_loss = 0.0
             random.shuffle(train_set)
 
-
             for x, y in train_set:
                 y_pred = self.__classifier_output(x)
                 loss = self.calc_loss(y, y_pred)
                 train_loss += loss
 
-                grads = GradientsCalculator.calc_gradients(x, y, y_pred, self.__params)
+                grads = self.__gradient_calculator.calc_gradients(x, y, y_pred, self.__params)
 
                 i = 0
                 while i < len(self.__params):
@@ -73,10 +73,6 @@ class FCClassifierModel(object):
 
             for t in output:
                 print(t)
-
-
-
-
 
     def test(self, test_set):
         acc, loss = self.__calc_accuracy_and_loss(test_set)
