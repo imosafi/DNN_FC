@@ -9,10 +9,9 @@ def main():
     data_loader = DataLoader()
     train_set, test_set = data_loader.load_dataset('mnist')
 
-    model = FCClassifierModel([784, 300, 100, 10], activation='tanh')
+    model = FCClassifierModel([784, 200, 100, 10], activation='tanh')
 
-    model.test(test_set)
-    model.train(train_set, 5, test_set)
+    model.train(train_set, epochs=20, val=test_set)
 
     create_confusion_matrix(model, test_set, 10)
 
