@@ -5,7 +5,7 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 
 
-ACTIVATION_NAMES = ['sigmoid', 'tanh']
+ACTIVATION_NAMES = ['sigmoid', 'tanh', 'relu']
 
 
 def softmax(x):
@@ -13,13 +13,24 @@ def softmax(x):
     e_x = np.exp(x - np.max(x))
     return e_x / e_x.sum()
 
+
 # xavier initialization
 def calc_init_fcnn_values(in_dim, out_dim):
     return math.sqrt(6) / math.sqrt(in_dim + out_dim)
 
 
 def sigmoid(x):
-  return 1 / (1 + np.exp(-x))
+    return 1 / (1 + np.exp(-x))
+
+
+def relu(x):
+    return np.maximum(x, 0, x)
+
+
+def relu_derivative(a):
+    a[a <= 0] = 0
+    a[a > 0] = 1
+    return a
 
 
 def sigmoid_derivative(a):
@@ -32,8 +43,8 @@ def tanh_derivative(a):
     return 1 - np.power(a, 2)
 
 
-ACTIVATION_NAME_TO_FUNC = {'sigmoid': sigmoid, 'tanh': np.tanh}
-ACTIVATION_NAME_TO_DERIVATIVE = {'sigmoid': sigmoid_derivative, 'tanh': tanh_derivative}
+ACTIVATION_NAME_TO_FUNC = {'sigmoid': sigmoid, 'tanh': np.tanh, 'relu': relu}
+ACTIVATION_NAME_TO_DERIVATIVE = {'sigmoid': sigmoid_derivative, 'tanh': tanh_derivative, 'relu': relu_derivative}
 
 
 def create_confusion_matrix(model, testset, categories_num):
@@ -47,6 +58,7 @@ def create_confusion_matrix(model, testset, categories_num):
     print('Confustion matrix:')
     for l in range(categories_num):
         print(confusion_martix[l])
+
 
 def ensure_directory_exists(dir):
     if not os.path.isdir(dir):
