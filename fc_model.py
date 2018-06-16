@@ -3,6 +3,8 @@ from utils import calc_init_fcnn_values, softmax, ACTIVATION_NAMES, save_test_va
 from gradients_calculator import GradientsCalculator
 import random
 from utils import ACTIVATION_NAME_TO_FUNC
+import math
+
 
 class FCClassifierModel(object):
     """We'll use the same activation function for the entire network sigmoid/tanh/relu"""
@@ -56,10 +58,10 @@ class FCClassifierModel(object):
         print('Start training.')
         train_acc_list, val_acc_list, train_loss_list, val_loss_list = [], [], [], []
         for epoch in range(epochs):
-            if use_decreasing_lr:
-                lr = LR / (epoch + 1)
-                if lr < 0.00003:
-                    lr = 0.00003
+            if use_decreasing_lr and epoch > 15:
+                lr = LR * math.pow(0.98, epochs)
+                if lr < 0.0001:
+                    lr = 0.0001
             else:
                 lr = LR
             output = []
